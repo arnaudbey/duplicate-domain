@@ -22,7 +22,9 @@ cache:clear and asset stuff
 
 ## make the script executable (from anywhere)
 > cd duplicate-domain
+
 > sudo chmod +x duplicate_domain.sh
+
 > sudo cp duplicate_domain.sh /usr/bin/
 
 #enjoy
