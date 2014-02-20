@@ -23,47 +23,47 @@ echo "
 "
 
 
-printIt "Répertoires disponibles"
+printIt "Available directories"
 ls -al | grep ^d | awk '{print $9}'
 
 $sourceDir = ""
 while [ ! -d "$sourceDir" ]; do
-    echo "le répertoire n'existe pas..."
-    read -p 'répertoire à copier ? : ' sourceDir
+    echo "This dir does not exist"
+    read -p 'Dir ti copy : ' sourceDir
 done
 
-read -p 'nom du nouveau domaine ? : ' targetDir
+read -p 'Name of the new dir : ' targetDir
 while [ -d "$targetDir" ]; do
-    echo "le répertoire existe déjà"
-    read -p 'nom du nouveau domaine ? : ' targetDir
+    echo "This dir already exists"
+    read -p 'Name of the new dir : ' targetDir
 done
-printIt "copie en cours..."
+printIt "copying... "
 sudo cp -ipdR ${sourceDir} ${targetDir}
-printIt "repertoire ${sourceDir} copié vers ${targetDir}"
+printIt "dir ${sourceDir}/ copied into ${targetDir}/"
 
-read -p 'User du compte root mysql : ' msqlRootUser
-read -p 'Password du compte root mysql : ' msqlRootPasswd
-read -p 'Nom de la nouvelle base à créer ? : ' newDB
+read -p 'mysql root login : ' msqlRootUser
+read -p 'mysql root password : ' msqlRootPasswd
+read -p 'Name of the new DB ? : ' newDB
 mysql --user="${msqlRootUser}" --password="${msqlRootPasswd}" --execute="CREATE DATABASE ${newDB};"
-printIt "Base ${newDB} créée"
+printIt "DB ${newDB} created"
 
 
-read -p 'Login du nouvel utilisateur mysql : ' loginNewUser
-read -p 'Password du nouvel utilisateur mysql : ' passwdNewUser
+read -p 'Login new mysql user : ' loginNewUser
+read -p 'Password new mysql user : ' passwdNewUser
 mysql --user="${msqlRootUser}" --password="${msqlRootPasswd}" --execute="grant usage on *.* to ${loginNewUser}@localhost identified by '${passwdNewUser}';"
-printIt "Utilisateur ${loginNewUser} créé"
+printIt "User ${loginNewUser} created"
 mysql --user="${msqlRootUser}" --password="${msqlRootPasswd}" --execute="grant all privileges on ${newDB}.* to ${loginNewUser}@localhost ;"
-printIt " ${loginNewUser} a maintenant les droits sur la base ${newDB}"
+printIt " ${loginNewUser} has now full rights on ${newDB}"
 
-read -p 'Nom de la DB qui sera copiée : ' oldDB
+read -p 'Name of the source DB (the one who has to be copied) : ' oldDB
 mysqldump -u ${msqlRootUser} -p${msqlRootPasswd} ${oldDB} | mysql -u ${msqlRootUser} -p${msqlRootPasswd} ${newDB}
-printIt "Base ${oldDB} dupliquée vers ${newDB}"
+printIt "DB ${oldDB} duplicated into ${newDB}"
 
 
 if [ -f "$targetDir"/logs/access.log ]; then
     sudo :> ${targetDir}/logs/access.log
     sudo :> ${targetDir}/logs/error.log
-    printIt "Logs vidés"
+    printIt "logs cleaned"
 fi
 
 if [ -f "$targetDir"/app/config/parameters.yml ]; then
@@ -71,9 +71,9 @@ if [ -f "$targetDir"/app/config/parameters.yml ]; then
     sudo sed -i -e 's/database_user.*$/database_user : '${loginNewUser}'/g' ${targetDir}/app/config/parameters.yml
     sudo sed -i -e 's/database_password.*$/database_password : '${passwdNewUser}'/g' ${targetDir}/app/config/parameters.yml
 
-    printIt "${targetDir}/app/config/parameters.yml modifié"
+    printIt "${targetDir}/app/config/parameters.yml modified"
 else
-    printIt "${sourceDir}/app/config/parameters.yml non trouvé"
+    printIt "${sourceDir}/app/config/parameters.yml not found"
 fi
 
 if [ -f /etc/apache2/sites-available/"$sourceDir" ]; then
@@ -81,9 +81,9 @@ if [ -f /etc/apache2/sites-available/"$sourceDir" ]; then
     sudo sed -i -e 's/'${sourceDir}'/'${targetDir}'/g' /etc/apache2/sites-available/${targetDir}
     sudo ln -s /etc/apache2/sites-available/${targetDir} /etc/apache2/sites-enabled/${targetDir}
 
-    printIt "/etc/apache2/sites-available/${targetDir}"
+    printIt "/etc/apache2/sites-available/${targetDir} created"
 else
-    printIt "/etc/apache2/sites-available/${sourceDir} non trouvé"
+    printIt "/etc/apache2/sites-available/${sourceDir} not found"
 fi
 
 if [ -d "$sourceDir"/app/config/ ]; then
@@ -91,16 +91,14 @@ if [ -d "$sourceDir"/app/config/ ]; then
     php app/console cache:clear --no-debug
     php app/console assetic:dump --no-debug
     php app/console assets:install --symlink --no-debug
-    printIt "Cache vidé, assetic dump et assets install (dev)"
+    printIt "cache clear, assetic dump and assets install (dev)"
     php app/console cache:clear --env=prod --no-debug
     php app/console assetic:dump --env=prod --no-debug
     php app/console assets:install --symlink --env=prod --no-debug
-    printIt "Cache vidé, assetic dump et assets install (prod)"
+    printIt "cache clear, assetic dump and assets install (prod)"
 fi
 
-printIt "!!!!!!!!!!!!!!!  PENSER AU CACHE APC !!!!!!!!!!!!!!!"
-printIt "!!!!!!!!!!!!!!!  PENSER AU CACHE APC !!!!!!!!!!!!!!!"
-printIt "!!!!!!!!!!!!!!!  PENSER AU CACHE APC !!!!!!!!!!!!!!!"
+printIt "!!!!!!!!!!!!!!!  And what about APC ? !!!!!!!!!!!!!!!"
 
 
 echo "
@@ -119,5 +117,4 @@ echo "
 ----------------------------------------------------------
             Duplicate a domain (for SHITTY sheeps)
 ----------------------------------------------------------
-
 "
