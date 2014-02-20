@@ -16,15 +16,13 @@ duplicate and modify the site on /etc/apache2/sites-avaible and enable it (the s
 
 cache:clear and asset stuff
 
-# use
-clone this repo
+# How to use
+## clone the project
+> git clone https://github.com/arnaudbey/duplicate-domain.git
 
-copy the .sh file to /var/www/ or cd ~/htdocs or ....
-
-cd /var/www/ or cd ~/htdocs or ....
-
-sh ./duplicate_domain.sh
-
-(and maybe restart apache)
+## make the script executable (from anywhere)
+> cd duplicate-domain
+> sudo chmod +x duplicate_domain.sh
+> sudo cp duplicate_domain.sh /usr/bin/
 
 #enjoy
