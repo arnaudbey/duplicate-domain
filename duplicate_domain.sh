@@ -1,13 +1,8 @@
 #!/bin/bash
 printIt () {
-    NORMAL="\\033[0;39m" 
-    TENTIONLESYEUX="\\033[1;31m"
-    echo "$TENTIONLESYEUX"
-    echo "######";
+    echo "##########";
     echo "###### "$1
-    echo "######";
-    echo "$NORMAL"
-
+    echo "##########";
 }
 
 clear
@@ -29,9 +24,9 @@ echo "
 
 
 printIt "Répertoires disponibles"
-ls
+ls -al | grep ^d | awk '{print $9}'
 
-read -p 'Domaine à dupliquer ? : ' sourceDir
+$sourceDir = ""
 while [ ! -d "$sourceDir" ]; do
     echo "le répertoire n'existe pas..."
     read -p 'répertoire à copier ? : ' sourceDir
