@@ -22,14 +22,13 @@ echo "
 ----------------------------------------------------------
 "
 
-
 printIt "Available directories"
 ls -al | grep ^d | awk '{print $9}'
 
-$sourceDir = ""
+read -p 'Dir to copy : ' sourceDir
 while [ ! -d "$sourceDir" ]; do
     echo "This dir does not exist"
-    read -p 'Dir ti copy : ' sourceDir
+    read -p 'Dir to copy : ' sourceDir
 done
 
 read -p 'Name of the new dir : ' targetDir
